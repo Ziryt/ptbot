@@ -1,0 +1,5 @@
+*.tgs
+*.gif
+learning.py
+/.idea
+.env
