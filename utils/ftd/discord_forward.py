@@ -9,7 +9,7 @@ from discord import SyncWebhook, File, Embed
 from telegram import Bot, Update
 from telegram.ext import ContextTypes
 
-from utils.ftd.message_serialiazer import create_ms
+from utils.ftd.message_serialiazer import create_ms, MS, Group
 from utils.misc.cast_ill import CastIll
 
 THREAD = CastIll(1124925499748130826)
@@ -43,20 +43,49 @@ async def send_sticker(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def send_message(all_updates: list[Update], context: ContextTypes.DEFAULT_TYPE):
-    message = await create_ms(msg=all_updates[0].message, upds=all_updates, bot=Bot)
-    print('kek')
+    message = MS(msg=all_updates[0].message, upds=all_updates, bot=Bot)
+    await message.set_vars()
+    if isinstance(message.op, Group):
+        await message.op.set_vars()
+    photo_bool = False
 
-    embeds1 = [Embed()]
+    embeds1: list[Embed] = [Embed()]
     embeds1[0].set_author(name=f'sent by {message.author_name}')
+    embeds1[0].url = 'https://wow.zamimg.com/images/wow/icons/large/inv_misc_questionmark.jpg'
     if message.op:
         embeds1[0].title = message.op.name
-        embeds1[0].url = message.op.chat.link
-        embeds1[0].set_thumbnail(url=await message.op.chat_url)
+        embeds1[0].url = message.op.url
+        embeds1[0].set_thumbnail(url=message.op.profile_pic)
     embeds1[0].description = message.text
+    if message.photos:
+        embeds1 = await add_photos(embeds1, message)
+    send(embeds1, videos=message.videos)
 
-    # TODO photo vioeo delete repo bc of env
 
-    webhook.send(embeds=embeds1)
+async def add_photos(embeds: list[Embed], msg: MS):
+    embeds[0].set_image(url=msg.photos[0])
+    if len(msg.photos) > 1:
+        ext = [discord.Embed(url=msg.op.url).set_image(url=photo_url) for photo_url in msg.photos[1:]]
+        embeds.extend(ext)
+    return embeds
+
+
+def send(embeds, videos):
+    if videos:
+        webhook.send(files=videos, embeds=embeds[:4])
+    else:
+        webhook.send(embeds=embeds[:4])
+    embeds_tail = embeds[4:]
+    while embeds_tail:
+        if len(embeds_tail) < 4:
+            webhook.send(embeds=embeds_tail)
+            break
+        current = []
+        for i in range(4):
+            current.append(embeds_tail[0])
+            del embeds_tail[0]
+        webhook.send(embeds=current)
+
 
     # reply = all_updates[0].message
     # upd_photos, upd_videos = await get_lists(all_updates)
