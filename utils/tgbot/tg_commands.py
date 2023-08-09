@@ -33,7 +33,7 @@ async def message_processing(update: Update, context: ContextTypes.DEFAULT_TYPE)
     if update.message.sticker:
         await send_sticker(update, context)
         return
-    if update.message.document:
+    if update.message.document and not update.message.caption and not update.message.text:
         await send_document(update, context)
         return
     received_list = await Bot.get_updates()

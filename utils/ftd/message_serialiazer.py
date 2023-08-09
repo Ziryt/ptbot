@@ -1,4 +1,5 @@
 import io
+import os
 
 import discord
 import telegram.error
@@ -28,7 +29,7 @@ class MS:
         self.photos = None
         self.videos = None
 
-        self.document = msg.document
+        self.document = None
         self.date = msg.forward_date.strftime(f'%H:%M\n%d %B, %Y ') or None
 
     def enrich_text(self, text):
@@ -65,6 +66,13 @@ class MS:
             video_bytes = [await video.download_as_bytearray() for video in video_files]
             self.videos = [discord.File(io.BytesIO(byte), filename=f"attch{i + 1}.mp4")
                            for i, byte in enumerate(video_bytes)]
+        if any(upd.message.document is not None for upd in self.upds):
+            docs = [await self.bot.get_file(upd.message.document.file_id)
+                    for upd in self.upds if upd.message.document]
+            doc_ext = iter([os.path.splitext(doc.file_path)[-1] for doc in docs])
+            doc_byte = [await doc.download_as_bytearray() for doc in docs]
+            self.document = [discord.File(io.BytesIO(byte), filename=f"doc{i + 1}{next(doc_ext)}")
+                             for i, byte in enumerate(doc_byte)]
 
 
 class OriginalPoster:
