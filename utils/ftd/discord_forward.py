@@ -11,9 +11,9 @@ from telegram.ext import ContextTypes
 from utils.ftd.message_serialiazer import MS, Group
 from utils.misc.cast_ill import CastIll
 
-THREAD = CastIll(os.getenv('TG_THREAD'))
+THREAD = CastIll(int(os.getenv('TG_THREAD')))
 
-webhook: Final = SyncWebhook.from_url(f'https://discord.com/api/webhooks/{os.getenv("TG_HUT")}')
+webhook: Final = SyncWebhook.from_url(f'https://discord.com/api/webhooks/{os.getenv("TG_HU")}')
 Bot = Bot(os.getenv('TG_TOKEN'))
 updates = []
 
@@ -21,7 +21,7 @@ updates = []
 async def send_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
     doc = await Bot.get_file(update.message.document.file_id)
     ext = os.path.splitext(doc.file_path)[-1]
-    webhook.send(file=File(io.BytesIO(await doc.download_as_bytearray()), filename=f'kek{ext}'))
+    webhook.send(file=File(io.BytesIO(await doc.download_as_bytearray()), filename=f'kek{ext}'), thread=THREAD)
 
 
 async def send_sticker(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -31,11 +31,11 @@ async def send_sticker(update: Update, context: ContextTypes.DEFAULT_TYPE):
         request.urlretrieve(sticker.file_path, "sticker.tgs")
         import subprocess
         subprocess.run([r"venv/Scripts/python.exe", 'call_inc.py'])
-        webhook.send(file=File(fp='result.gif'))
+        webhook.send(file=File(fp='result.gif'), thread=THREAD)
         os.remove('sticker.tgs')
         os.remove('result.gif')
     else:
-        webhook.send(file=File(io.BytesIO(await sticker.download_as_bytearray()), filename=f'kek{ext}'))
+        webhook.send(file=File(io.BytesIO(await sticker.download_as_bytearray()), filename=f'kek{ext}'), thread=THREAD)
 
 
 async def send_message(all_updates: list[Update], context: ContextTypes.DEFAULT_TYPE):
@@ -73,16 +73,16 @@ def send(embeds, videos, docs):
     if docs:
         files.extend(docs)
     if videos or docs:
-        webhook.send(files=files, embeds=embeds[:4])
+        webhook.send(files=files, embeds=embeds[:4], thread=THREAD)
     else:
-        webhook.send(embeds=embeds[:4])
+        webhook.send(embeds=embeds[:4], thread=THREAD)
     embeds_tail = embeds[4:]
     while embeds_tail:
         if len(embeds_tail) < 4:
-            webhook.send(embeds=embeds_tail)
+            webhook.send(embeds=embeds_tail, thread=THREAD)
             break
         current = []
         for i in range(4):
             current.append(embeds_tail[0])
             del embeds_tail[0]
-        webhook.send(embeds=current)
+        webhook.send(embeds=current, thread=THREAD)
