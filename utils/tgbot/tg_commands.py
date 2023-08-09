@@ -32,12 +32,13 @@ async def moyai_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def message_processing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.sticker:
         await send_sticker(update, context)
+        return
     if update.message.document:
         await send_document(update, context)
-    else:
-        received_list = await Bot.get_updates()
-        if not updates:
-            updates.extend(received_list)
-        if update.message.message_id == updates[-1].message.message_id:
-            await send_message(updates, context)
-            updates.clear()
+        return
+    received_list = await Bot.get_updates()
+    if not updates:
+        updates.extend(received_list)
+    if update.message.message_id == updates[-1].message.message_id:
+        await send_message(updates, context)
+        updates.clear()

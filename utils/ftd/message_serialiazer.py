@@ -29,7 +29,7 @@ class MS:
         self.videos = None
 
         self.document = msg.document
-        self.date = msg.forward_date or None
+        self.date = msg.forward_date.strftime(f'%H:%M\n%d %B, %Y ') or None
 
     def enrich_text(self, text):
         correction = -len(get(text))
