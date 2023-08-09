@@ -44,18 +44,18 @@ async def send_message(all_updates: list[Update], context: ContextTypes.DEFAULT_
     if isinstance(message.op, Group):
         await message.op.set_vars()
 
-    embeds1: list[Embed] = [Embed()]
-    embeds1[0].set_author(name=f'sent by {message.author_name}')
-    embeds1[0].url = 'https://wow.zamimg.com/images/wow/icons/large/inv_misc_questionmark.jpg'
-    embeds1[0].set_footer(text=message.date)
+    embeds: list[Embed] = [Embed()]
+    embeds[0].set_author(name=f'sent by {message.author_name}')
+    embeds[0].url = 'https://wow.zamimg.com/images/wow/icons/large/inv_misc_questionmark.jpg'
+    embeds[0].set_footer(text=message.date)
     if message.op:
-        embeds1[0].title = message.op.name
-        embeds1[0].url = message.op.url
-        embeds1[0].set_thumbnail(url=message.op.profile_pic)
-    embeds1[0].description = message.text
+        embeds[0].title = message.op.name
+        embeds[0].url = message.op.url
+        embeds[0].set_thumbnail(url=message.op.profile_pic)
+    embeds[0].description = message.text
     if message.photos:
-        embeds1 = await add_photos(embeds1, message)
-    send(embeds1, videos=message.videos, docs=message.document)
+        embeds = await add_photos(embeds, message)
+    send(embeds, videos=message.videos, docs=message.document)
 
 
 async def add_photos(embeds: list[Embed], msg: MS):
