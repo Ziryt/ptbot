@@ -30,7 +30,6 @@ async def send_sticker(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if ext == '.tgs':
         request.urlretrieve(sticker.file_path, "sticker.tgs")
         import subprocess
-        print('converting sticker...')
         subprocess.run([r"venv/Scripts/python.exe", 'call_inc.py'])
         webhook.send(file=File(fp='result.gif'))
         os.remove('sticker.tgs')

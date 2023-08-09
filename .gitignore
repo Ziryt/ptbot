@@ -3,3 +3,5 @@
 learning.py
 /.idea
 .env
+.dockerignore
+Dockerfile
