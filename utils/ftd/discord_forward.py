@@ -47,7 +47,8 @@ async def send_message(all_updates: list[Update], context: ContextTypes.DEFAULT_
     embeds: list[Embed] = [Embed()]
     embeds[0].set_author(name=f'sent by {message.author_name}')
     embeds[0].url = 'https://wow.zamimg.com/images/wow/icons/large/inv_misc_questionmark.jpg'
-    embeds[0].set_footer(text=message.date)
+    if message.date:
+        embeds[0].set_footer(text=message.date)
     if message.op:
         embeds[0].title = message.op.name
         embeds[0].url = message.op.url

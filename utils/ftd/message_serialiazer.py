@@ -20,17 +20,18 @@ class MS:
         if msg.forward_from:
             self.op = OriginalPoster(self.msg)
 
+        self.text = msg.caption or msg.text or None
         if msg.caption_entities or msg.entities:
             self.entities = msg.caption_entities or msg.entities
             self.enrich_text(msg.caption or msg.text)
-        else:
-            self.text = msg.caption or msg.text or None
 
         self.photos = None
         self.videos = None
 
         self.document = None
-        self.date = msg.forward_date.strftime(f'%H:%M\n%d %B, %Y ') or None
+        self.date = None
+        if msg.forward_from or msg.forward_from_chat:
+            self.date = msg.forward_date.strftime(f'%H:%M\n%d %B, %Y ')
 
     def enrich_text(self, text):
         correction = -len(get(text))
